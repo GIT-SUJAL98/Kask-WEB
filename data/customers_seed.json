@@ -1,0 +1,219 @@
+[
+  {
+    "id": 1,
+    "name": "Suman Bhandari",
+    "phone": "9851133129",
+    "credit_limit": 10000.0,
+    "current_balance": 2640.0
+  },
+  {
+    "id": 2,
+    "name": "Shiva Thapa",
+    "phone": "9841182576",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 3,
+    "name": "Kamal Bhandari",
+    "phone": "9841272562",
+    "credit_limit": 10000.0,
+    "current_balance": 1935.0
+  },
+  {
+    "id": 4,
+    "name": "Raju Uncle",
+    "phone": "12334567890",
+    "credit_limit": 10000.0,
+    "current_balance": 80.0
+  },
+  {
+    "id": 5,
+    "name": "Mohan Uncle",
+    "phone": "99898987989",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 6,
+    "name": "Deepika aunty",
+    "phone": "9999999999",
+    "credit_limit": 40000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 7,
+    "name": "Ramesh Uncle",
+    "phone": "1111111111",
+    "credit_limit": 30000.0,
+    "current_balance": 11735.0
+  },
+  {
+    "id": 8,
+    "name": "Rowan",
+    "phone": "9842576587",
+    "credit_limit": 5000.0,
+    "current_balance": 710.0
+  },
+  {
+    "id": 9,
+    "name": "aalam dai",
+    "phone": "9703460868",
+    "credit_limit": 25000.0,
+    "current_balance": 960.0
+  },
+  {
+    "id": 10,
+    "name": "Sanjib dost",
+    "phone": "9845255962",
+    "credit_limit": 10000.0,
+    "current_balance": 250.0
+  },
+  {
+    "id": 11,
+    "name": "Gauri aama",
+    "phone": "",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 12,
+    "name": "aale tamang",
+    "phone": "9767748913",
+    "credit_limit": 10000.0,
+    "current_balance": 4820.0
+  },
+  {
+    "id": 13,
+    "name": "narayan uncle",
+    "phone": "9840121767",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 14,
+    "name": "Thakur sir",
+    "phone": "",
+    "credit_limit": 10000.0,
+    "current_balance": 1120.0
+  },
+  {
+    "id": 15,
+    "name": "Sandesh Dai",
+    "phone": "9191919",
+    "credit_limit": 10000.0,
+    "current_balance": 5990.0
+  },
+  {
+    "id": 16,
+    "name": "sarun",
+    "phone": "9845258375",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 17,
+    "name": "Rabindra Lato",
+    "phone": "11221122",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 18,
+    "name": "Dinesh Bohora",
+    "phone": "9741878158",
+    "credit_limit": 10000.0,
+    "current_balance": 1450.0
+  },
+  {
+    "id": 19,
+    "name": "Sangam Bhai",
+    "phone": "000000",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 20,
+    "name": "Aashika Shrestha",
+    "phone": "9818302496",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 21,
+    "name": "lamichane uncel",
+    "phone": "999999999999",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 22,
+    "name": "rabin",
+    "phone": "11223344",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 23,
+    "name": "Sunil Sunwar",
+    "phone": "9851155153",
+    "credit_limit": 10000.0,
+    "current_balance": 1170.0
+  },
+  {
+    "id": 24,
+    "name": "kamal(dad)",
+    "phone": "98412725462",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 25,
+    "name": "Rabin Bhandari",
+    "phone": "9840200338",
+    "credit_limit": 10000.0,
+    "current_balance": 4400.0
+  },
+  {
+    "id": 26,
+    "name": "Roshan Karki",
+    "phone": "9862584374",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 27,
+    "name": "palma aunty",
+    "phone": "99009900",
+    "credit_limit": 20000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 28,
+    "name": "Jun aftar",
+    "phone": "9090909090",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 29,
+    "name": "Ganesh Uncle",
+    "phone": "9840214801",
+    "credit_limit": 10000.0,
+    "current_balance": 0.0
+  },
+  {
+    "id": 30,
+    "name": "Rikens shrestha",
+    "phone": "9765067746",
+    "credit_limit": 5000.0,
+    "current_balance": 1460.0
+  },
+  {
+    "id": 31,
+    "name": "MOHAN rai",
+    "phone": "9765431627",
+    "credit_limit": 10000.0,
+    "current_balance": 455.0
+  }
+]

@@ -1,0 +1,35 @@
+# Operating System Files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors & IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python runtime & environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# Local Databases, WAL logs & sensitive POS SQLite files
+*.db-wal
+*.db-shm
+*.db-journal
+pos_data.db
+*.sqlite3
+
+# Local credentials & environment overrides
+.env
+.env.local
+*.local.json
+
+# Local agent scratchpad / temporary exports
+scratch/

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Store Terminal — Total Wine & More Approvals</title>
+  <meta name="theme-color" content="#670024">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: var(--bg-page);">
+
+  <!-- Header -->
+  <header class="tw-main-header" role="banner">
+    <div class="tw-header-inner">
+      <div class="tw-logo-wrap">
+        <div class="tw-logo-emblem" style="background: #FFFFFF; color: var(--tw-burgundy);" aria-hidden="true">📲</div>
+        <div class="tw-logo-text">
+          <span class="tw-logo-main">Total Wine</span>
+          <span class="tw-logo-sub">STORE COMPANION TERMINAL</span>
+        </div>
+      </div>
+
+      <div class="tw-header-actions">
+        <button type="button" id="toggleAudioBtn" class="btn-header-cart" style="font-size: 12px; padding: 6px 12px;">
+          🔔 Audio Alert: ON
+        </button>
+        <button type="button" id="testAudioBtn" class="btn-header-cart" style="font-size: 12px; padding: 6px 10px;" title="Test Chime Sound">
+          🔊 Test
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="tw-hero-section" style="max-width: 860px; margin: 24px auto;" role="main">
+
+    <!-- Summary KPI Header -->
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px;" aria-label="Terminal Metrics">
+      <div style="background: #FFFFFF; border: 1.5px solid var(--tw-burgundy-border); border-radius: var(--radius-md); padding: 16px; text-align: center; box-shadow: var(--shadow-xs);">
+        <div style="font-size: 11.5px; font-weight: 800; color: var(--tw-burgundy); text-transform: uppercase; letter-spacing: 0.5px;">Awaiting Approval</div>
+        <div id="kpiPendingCount" style="font-size: 28px; font-weight: 900; color: var(--text-primary); margin-top: 4px;">0</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1.5px solid #A7F3D0; border-radius: var(--radius-md); padding: 16px; text-align: center; box-shadow: var(--shadow-xs);">
+        <div style="font-size: 11.5px; font-weight: 800; color: var(--tw-green); text-transform: uppercase; letter-spacing: 0.5px;">Approved Today</div>
+        <div id="kpiApprovedCount" style="font-size: 28px; font-weight: 900; color: var(--tw-green); margin-top: 4px;">0</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1.5px solid var(--border-light); border-radius: var(--radius-md); padding: 16px; text-align: center; box-shadow: var(--shadow-xs);">
+        <div style="font-size: 11.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Terminal Status</div>
+        <div style="font-size: 13.5px; font-weight: 800; color: #1D4ED8; margin-top: 10px;">● Listening (Live Sync)</div>
+      </div>
+    </section>
+
+    <!-- Filter Tabs & Controls -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="fulfillment-chip active" id="tabTerminalPending" style="font-size: 12px; padding: 6px 14px; background: var(--tw-burgundy); color: #FFF;">⏳ Pending (<span id="tabCountPending">0</span>)</button>
+        <button type="button" class="fulfillment-chip" id="tabTerminalApproved" style="font-size: 12px; padding: 6px 14px; background: #F4F4F5; color: var(--text-primary);">✓ Approved</button>
+        <button type="button" class="fulfillment-chip" id="tabTerminalAll" style="font-size: 12px; padding: 6px 14px; background: #F4F4F5; color: var(--text-primary);">All Invoices</button>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button type="button" id="btnRefreshOrders" class="btn-tw-add-cart" style="font-size: 12px; padding: 6px 14px; background: #FFFFFF; color: var(--text-primary); border-color: var(--border-medium);">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <div id="ordersContainer" style="display: flex; flex-direction: column; gap: 16px;" aria-live="polite">
+      <!-- Injected by script -->
+    </div>
+
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let isAudioEnabled = true;
+    let knownOrderCodes = new Set();
+    let audioCtx = null;
+    let currentFilter = 'PENDING';
+    let cachedOrders = [];
+
+    function playChime() {
+      if (!isAudioEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.setValueAtTime(880.00, now + 0.15);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+      const testAudioBtn = document.getElementById('testAudioBtn');
+
+      toggleAudioBtn.addEventListener('click', () => {
+        isAudioEnabled = !isAudioEnabled;
+        toggleAudioBtn.textContent = isAudioEnabled ? '🔔 Audio Alert: ON' : '🔕 Audio Alert: OFF';
+        if (isAudioEnabled) playChime();
+      });
+
+      testAudioBtn?.addEventListener('click', playChime);
+
+      document.getElementById('btnRefreshOrders').addEventListener('click', loadOrders);
+
+      // Filter Tabs
+      const tabPending = document.getElementById('tabTerminalPending');
+      const tabApproved = document.getElementById('tabTerminalApproved');
+      const tabAll = document.getElementById('tabTerminalAll');
+
+      [tabPending, tabApproved, tabAll].forEach(t => {
+        t?.addEventListener('click', () => {
+          [tabPending, tabApproved, tabAll].forEach(x => {
+            x?.classList.remove('active');
+            x.style.background = '#F4F4F5';
+            x.style.color = 'var(--text-primary)';
+          });
+          t.classList.add('active');
+          t.style.background = 'var(--tw-burgundy)';
+          t.style.color = '#FFFFFF';
+
+          if (t === tabPending) currentFilter = 'PENDING';
+          if (t === tabApproved) currentFilter = 'APPROVED';
+          if (t === tabAll) currentFilter = 'ALL';
+          renderOrders(cachedOrders);
+        });
+      });
+
+      loadOrders();
+      setInterval(loadOrders, 3000);
+
+      window.addEventListener('kask:order_created', (e) => {
+        playChime();
+        loadOrders();
+      });
+    });
+
+    async function loadOrders() {
+      const orders = await window.api.getAllDraftOrders();
+      cachedOrders = orders;
+      renderOrders(orders);
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById('ordersContainer');
+      const pendingOrders = orders.filter(o => o.status === 'PENDING_APPROVAL');
+      const approvedOrders = orders.filter(o => o.status === 'APPROVED' || o.status === 'PACKED' || o.status === 'COMPLETED');
+
+      document.getElementById('kpiPendingCount').textContent = pendingOrders.length;
+      document.getElementById('kpiApprovedCount').textContent = approvedOrders.length;
+      document.getElementById('tabCountPending').textContent = pendingOrders.length;
+
+      // Detect incoming for chime
+      pendingOrders.forEach(o => {
+        if (!knownOrderCodes.has(o.order_code)) {
+          knownOrderCodes.add(o.order_code);
+          playChime();
+        }
+      });
+
+      let displayedOrders = orders;
+      if (currentFilter === 'PENDING') displayedOrders = pendingOrders;
+      else if (currentFilter === 'APPROVED') displayedOrders = approvedOrders;
+
+      if (displayedOrders.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px; background: #FFFFFF; border: 1px dashed var(--border-medium); border-radius: var(--radius-lg); color: var(--text-muted);">
+            <div style="font-size: 44px; margin-bottom: 12px;">📭</div>
+            <h3 style="color: var(--text-primary); font-size: 17px; font-weight: 800; margin-bottom: 6px;">No Invoices in This View</h3>
+            <p style="font-size: 13.5px; max-width: 320px; margin: 0 auto;">Customer draft invoices submitted from the web storefront will appear here in real-time.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = displayedOrders.map(order => {
+        const isPending = order.status === 'PENDING_APPROVAL';
+        const isApproved = order.status === 'APPROVED' || order.status === 'PACKED' || order.status === 'COMPLETED';
+        const isRejected = order.status === 'REJECTED';
+
+        let statusChip = '';
+        if (isPending) statusChip = `<span style="background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-xs);">⏳ Awaiting Stock Verification</span>`;
+        if (isApproved) statusChip = `<span style="background: #ECFDF5; color: var(--tw-green); border: 1px solid #A7F3D0; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-xs);">✓ Approved & In Till</span>`;
+        if (isRejected) statusChip = `<span style="background: #FEE2E2; color: var(--tw-red); border: 1px solid #FECACA; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-xs);">✕ Declined</span>`;
+
+        return `
+          <div style="background: #FFFFFF; border: 1px solid ${isPending ? 'var(--tw-burgundy)' : 'var(--border-light)'}; border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <h3 style="font-size: 19px; font-weight: 900; color: var(--text-primary);">#${order.order_code}</h3>
+                  ${statusChip}
+                </div>
+                <div style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">
+                  👤 <strong style="color: var(--text-primary);">${order.customer_name}</strong> • 📞 <a href="tel:${order.customer_phone}" style="color: var(--tw-burgundy); font-weight: 700; text-decoration: none;">${order.customer_phone}</a>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 20px; font-weight: 900; color: var(--tw-burgundy);">Rs. ${(order.total_amount || 0).toLocaleString()}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">${order.order_type === 'PICKUP' ? '🚶 In-Store Pickup' : '🛵 Delivery'}</div>
+              </div>
+            </div>
+
+            <!-- Khata Credit Warning Box -->
+            ${order.payment_mode === 'KHATA' ? `
+              <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: var(--radius-xs); padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px;">
+                <strong style="color: #92400E;">📓 Khata Credit Account Request:</strong>
+                <span style="color: #78350F;"> Charges Rs. ${(order.total_amount || 0).toLocaleString()} to member's store ledger.</span>
+              </div>
+            ` : ''}
+
+            <!-- Special Notes -->
+            ${order.notes ? `
+              <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: var(--radius-xs); padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #1E40AF;">
+                📝 <strong>Special Note:</strong> ${order.notes}
+              </div>
+            ` : ''}
+
+            <!-- Items List -->
+            <div style="background: #F8F9FA; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Requested Items:</div>
+              ${(order.items || []).map(it => `
+                <div style="display: flex; justify-content: space-between; font-size: 13.5px; padding: 5px 0; border-bottom: 1px dashed var(--border-light);">
+                  <span style="color: var(--text-primary);">${it.name || it.product_name} <strong style="color: var(--tw-burgundy);">× ${it.qty}</strong></span>
+                  <span style="color: var(--text-secondary); font-weight: 700;">Rs. ${((it.price || it.unit_price) * it.qty).toLocaleString()}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Action Buttons for Pending Invoices -->
+            ${isPending ? `
+              <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-tw-checkout" style="flex: 2; margin-top: 0; padding: 12px;" onclick="approveOrder('${order.order_code}')">
+                  ✓ Approve & Park in POS Till
+                </button>
+                <button type="button" class="btn-tw-add-cart" style="flex: 1; justify-content: center; background: #FEE2E2; border-color: #FECACA; color: var(--tw-red);" onclick="rejectOrder('${order.order_code}')">
+                  ✕ Decline
+                </button>
+              </div>
+            ` : isApproved ? `
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--tw-green); background: #ECFDF5; border: 1px solid #A7F3D0; padding: 10px 14px; border-radius: var(--radius-sm);">
+                <span>✓ Invoice approved and injected into POS Till parked carts.</span>
+                <span>Pickup Code: <strong style="color: var(--tw-burgundy);">${order.pickup_code || '8412'}</strong></span>
+              </div>
+            ` : `
+              <div style="font-size: 12.5px; color: var(--tw-red);">
+                Reason: ${order.rejection_reason || 'Declined by store manager'}
+              </div>
+            `}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function approveOrder(orderCode) {
+      if (confirm(`Approve Draft Invoice #${orderCode}? This will inject the order into your POS Till parked carts.`)) {
+        await window.api.updateOrderStatus(orderCode, 'APPROVED');
+        loadOrders();
+      }
+    }
+
+    async function rejectOrder(orderCode) {
+      const reason = prompt("Enter reason for declining (e.g. 'Sold out at counter 2 mins ago', 'Store closed curfew'):", "Sold out at counter");
+      if (reason) {
+        await window.api.updateOrderStatus(orderCode, 'REJECTED', reason);
+        loadOrders();
+      }
+    }
+  </script>
+</body>
+</html>

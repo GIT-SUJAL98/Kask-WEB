@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Order Status Tracker — Total Wine & More</title>
+  <meta name="description" content="Live draft invoice status tracker for Total Wine & More orders. Track real-time store stock verification, POS till packing, and pickup/NepalQR settlement.">
+  <meta name="theme-color" content="#670024">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: var(--bg-page);">
+
+  <!-- Sticky Top Navigation -->
+  <header class="tw-main-header" role="banner">
+    <div class="tw-header-inner">
+      <a href="index.html" class="tw-logo-wrap" aria-label="Return to Storefront">
+        <div class="tw-logo-emblem" aria-hidden="true">📦</div>
+        <div class="tw-logo-text">
+          <span class="tw-logo-main">Total Wine</span>
+          <span class="tw-logo-sub">ORDER STATUS & TRACKING</span>
+        </div>
+      </a>
+
+      <div class="tw-header-actions">
+        <a href="index.html" class="btn-header-cart" style="font-size: 13px; text-decoration: none;">
+          <span>+ New Order</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="tw-hero-section" style="max-width: 760px; margin: 30px auto; padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));" role="main">
+    
+    <!-- Loading State -->
+    <div id="loadingTracker" style="text-align: center; padding: 60px 20px; color: var(--text-muted);" aria-live="polite">
+      <div style="font-size: 40px; margin-bottom: 12px;">⌛</div>
+      <p style="font-size: 15px; font-weight: 700; color: var(--text-primary);">Fetching live order status from Total Wine Cloud...</p>
+    </div>
+
+    <!-- Order Details Card -->
+    <div id="orderCard" style="display: none;" aria-live="polite">
+      
+      <!-- Top Status Banner -->
+      <section style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 26px; margin-bottom: 20px; box-shadow: var(--shadow-sm);" aria-labelledby="orderCodeHeading">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: var(--tw-burgundy); text-transform: uppercase; letter-spacing: 0.5px;">Store Draft Invoice</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h1 id="orderCodeHeading" style="font-size: 26px; font-weight: 900; color: var(--text-primary); letter-spacing: -0.5px;">KASK-0000</h1>
+              <button type="button" id="btnCopyOrderCode" class="btn-tw-add-cart" style="padding: 4px 10px; font-size: 11px; background: #F4F4F5; color: var(--text-primary); border-color: var(--border-medium);" title="Copy Order Code">
+                📋 Copy
+              </button>
+            </div>
+          </div>
+          <div id="statusBadgeContainer">
+            <!-- Injected -->
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding-top: 14px; border-top: 1px solid var(--border-light); font-size: 13.5px;">
+          <div>
+            <span style="color: var(--text-muted);">Customer:</span> 
+            <strong id="custNameText" style="color: var(--text-primary);">-</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Payment Mode:</span> 
+            <strong id="paymentModeText" style="color: var(--tw-burgundy);">-</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Fulfillment:</span> 
+            <strong id="orderTypeText" style="color: var(--text-primary);">-</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Total Order Due:</span> 
+            <strong id="totalAmountText" style="color: var(--tw-burgundy); font-size: 16px; font-weight: 900;">-</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Interactive Approval Stepper Timeline -->
+      <section style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm);" aria-label="Order Status Timeline">
+        <h2 style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">Live Status Timeline</h2>
+        
+        <div class="timeline-wrapper" id="timelineWrapper">
+          
+          <div class="timeline-step">
+            <div class="step-marker done">✓</div>
+            <div class="step-title" style="color: var(--text-primary);">Draft Invoice Transmitted</div>
+            <div class="step-desc">Order items compiled and transmitted to store owner terminal.</div>
+          </div>
+
+          <div class="timeline-step" id="stepApproval">
+            <div class="step-marker" id="markerApproval">2</div>
+            <div class="step-title" id="titleApproval" style="color: var(--text-primary);">Store Shelf Stock Verification</div>
+            <div class="step-desc" id="descApproval">Store manager is verifying physical bottles on the shelf.</div>
+          </div>
+
+          <div class="timeline-step" id="stepPacked">
+            <div class="step-marker" id="markerPacked">3</div>
+            <div class="step-title" id="titlePacked" style="color: var(--text-primary);">Packing & Parking in POS Till</div>
+            <div class="step-desc" id="descPacked">Invoice held in register for instant counter checkout.</div>
+          </div>
+
+          <div class="timeline-step" id="stepComplete">
+            <div class="step-marker" id="markerComplete">4</div>
+            <div class="step-title" id="titleComplete" style="color: var(--text-primary);">Handoff & Completed</div>
+            <div class="step-desc" id="descComplete">Customer pickup verified or dispatched with Lalitpur rider.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Action & Dynamic QR Box (Shown when Approved) -->
+      <section id="approvedActionBox" style="display: none; background: #FDF2F4; border: 1px solid var(--tw-burgundy-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+        <!-- Injected dynamically -->
+      </section>
+
+      <!-- Items Breakdown List -->
+      <section style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-xs);" aria-label="Ordered Items">
+        <h3 style="font-size: 15.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">Order Summary</h3>
+        <div id="orderItemsList" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Injected -->
+        </div>
+      </section>
+
+      <!-- Interactive Simulation Controls for Demo & Testing -->
+      <section style="background: #FFFFFF; border: 1px dashed var(--tw-gold); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px; text-align: center;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--tw-gold-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+          ⚡ Interactive Demo Simulation Tools
+        </div>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 12px;">
+          Simulate store terminal actions directly to test status changes in real-time:
+        </p>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="fulfillment-chip" id="btnSimulateApprove" style="font-size: 12px; padding: 6px 14px; background: #ECFDF5; border-color: #A7F3D0; color: var(--tw-green);">
+            ✓ Simulate Approve
+          </button>
+          <button type="button" class="fulfillment-chip" id="btnSimulatePacked" style="font-size: 12px; padding: 6px 14px; background: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8;">
+            📦 Simulate Packed in Till
+          </button>
+          <button type="button" class="fulfillment-chip" id="btnSimulateComplete" style="font-size: 12px; padding: 6px 14px; background: #FEF3C7; border-color: #FCD34D; color: #92400E;">
+            🎉 Simulate Completed
+          </button>
+        </div>
+      </section>
+
+      <!-- WhatsApp Help Button -->
+      <div style="text-align: center; margin-bottom: 40px;">
+        <a id="btnWhatsAppStore" href="#" target="_blank" rel="noopener noreferrer" class="btn-tw-add-cart" style="display: inline-flex; justify-content: center; background: #25D366; border-color: #25D366; color: #FFFFFF; font-size: 14px; padding: 12px 26px;">
+          💬 Chat with Store Manager on WhatsApp
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    let currentOrder = null;
+    let lastRenderedStatus = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      let code = urlParams.get('code');
+
+      if (!code) {
+        const localOrders = window.api.getLocalOrders();
+        if (localOrders && localOrders.length > 0) {
+          code = localOrders[0].order_code;
+        }
+      }
+
+      if (!code) {
+        document.getElementById('loadingTracker').innerHTML = `
+          <div style="font-size: 44px; margin-bottom: 12px;">⚠️</div>
+          <h2 style="color: var(--text-primary); font-size: 18px; font-weight: 800; margin-bottom: 6px;">No Active Order to Track</h2>
+          <p style="font-size: 13.5px; max-width: 320px; margin: 0 auto 20px auto; color: var(--text-secondary);">
+            Please select spirits or fine wines from the catalog to draft an order.
+          </p>
+          <a href="index.html" class="btn-tw-checkout" style="max-width: 220px; margin: 0 auto; display: block; text-decoration: none; text-align: center;">Browse Catalog</a>
+        `;
+        return;
+      }
+
+      loadOrder(code);
+
+      // Periodic refresh
+      setInterval(() => {
+        loadOrder(code, true);
+      }, 3000);
+
+      window.addEventListener('kask:order_status_updated', (e) => {
+        if (e.detail.order_code === code) {
+          renderOrder(e.detail);
+        }
+      });
+
+      // Simulation Button Listeners
+      document.getElementById('btnSimulateApprove')?.addEventListener('click', async () => {
+        if (!currentOrder) return;
+        await window.api.updateOrderStatus(currentOrder.order_code, 'APPROVED');
+        loadOrder(currentOrder.order_code);
+      });
+
+      document.getElementById('btnSimulatePacked')?.addEventListener('click', async () => {
+        if (!currentOrder) return;
+        await window.api.updateOrderStatus(currentOrder.order_code, 'PACKED');
+        loadOrder(currentOrder.order_code);
+      });
+
+      document.getElementById('btnSimulateComplete')?.addEventListener('click', async () => {
+        if (!currentOrder) return;
+        await window.api.updateOrderStatus(currentOrder.order_code, 'COMPLETED');
+        loadOrder(currentOrder.order_code);
+      });
+
+      // Copy Order Code
+      document.getElementById('btnCopyOrderCode')?.addEventListener('click', () => {
+        if (currentOrder) {
+          navigator.clipboard.writeText(currentOrder.order_code).then(() => {
+            const btn = document.getElementById('btnCopyOrderCode');
+            btn.textContent = "✓ Copied!";
+            setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000);
+          });
+        }
+      });
+    });
+
+    async function loadOrder(code, isPoll = false) {
+      const order = await window.api.getDraftOrderByCode(code);
+      if (!order) {
+        if (!isPoll) {
+          document.getElementById('loadingTracker').innerHTML = `
+            <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+            <h3 style="color: var(--text-primary); margin-bottom: 6px;">Order #${code} Not Found</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary);">This order may have expired or was entered incorrectly.</p>
+          `;
+        }
+        return;
+      }
+
+      currentOrder = order;
+
+      if (lastRenderedStatus && lastRenderedStatus !== order.status && (order.status === 'APPROVED' || order.status === 'COMPLETED')) {
+        window.cart?.playChime('success');
+      }
+      lastRenderedStatus = order.status;
+
+      renderOrder(order);
+    }
+
+    function renderOrder(order) {
+      document.getElementById('loadingTracker').style.display = 'none';
+      document.getElementById('orderCard').style.display = 'block';
+
+      document.getElementById('orderCodeHeading').textContent = order.order_code;
+      document.getElementById('custNameText').textContent = order.customer_name;
+      document.getElementById('paymentModeText').textContent = order.payment_mode === 'KHATA' ? '📓 Khata Credit' : (order.payment_mode === 'FONEPAY_QR' ? '📱 FonePay QR' : '💵 Cash');
+      document.getElementById('orderTypeText').textContent = order.order_type === 'PICKUP' ? '🚶 In-Store Counter Pickup' : `🛵 Delivery (${order.delivery_address})`;
+      document.getElementById('totalAmountText').textContent = `Rs. ${(order.total_amount || 0).toLocaleString()}`;
+
+      // Status Badge
+      const statusContainer = document.getElementById('statusBadgeContainer');
+      const actionBox = document.getElementById('approvedActionBox');
+      
+      const mApp = document.getElementById('markerApproval');
+      const mPack = document.getElementById('markerPacked');
+      const mComp = document.getElementById('markerComplete');
+      const descApp = document.getElementById('descApproval');
+
+      if (order.status === 'PENDING_APPROVAL') {
+        statusContainer.innerHTML = `<span style="background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; font-size: 12.5px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-full);">⏳ Pending Stock Approval</span>`;
+        mApp.className = 'step-marker active';
+        mApp.textContent = '●';
+        descApp.textContent = "Store companion app received draft invoice. Confirming bottle stock on shelf (avg: 2 min)...";
+        actionBox.style.display = 'none';
+      } 
+      else if (order.status === 'APPROVED' || order.status === 'PACKED' || order.status === 'COMPLETED') {
+        statusContainer.innerHTML = `<span style="background: #ECFDF5; color: var(--tw-green); border: 1px solid #A7F3D0; font-size: 12.5px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-full);">✓ Order Approved</span>`;
+        mApp.className = 'step-marker done';
+        mApp.textContent = '✓';
+        descApp.textContent = "Store manager approved the order and verified shelf inventory.";
+
+        if (order.status === 'PACKED' || order.status === 'COMPLETED') {
+          mPack.className = 'step-marker done';
+          mPack.textContent = '✓';
+        } else {
+          mPack.className = 'step-marker active';
+          mPack.textContent = '●';
+        }
+
+        if (order.status === 'COMPLETED') {
+          mComp.className = 'step-marker done';
+          mComp.textContent = '✓';
+        }
+
+        // Render Action / Dynamic QR
+        actionBox.style.display = 'block';
+        if (order.order_type === 'PICKUP') {
+          actionBox.innerHTML = `
+            <div style="font-size: 11.5px; font-weight: 800; color: var(--tw-burgundy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ready for Counter Collection</div>
+            <h2 style="font-size: 21px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Show this 4-Digit Pickup Code to Cashier</h2>
+            <div style="display: inline-block; background: #FFFFFF; border: 2px dashed var(--tw-burgundy); padding: 14px 34px; border-radius: var(--radius-md); font-size: 34px; font-weight: 900; letter-spacing: 6px; color: var(--tw-burgundy); margin-bottom: 12px; cursor: pointer;" id="pickupCodeBox" title="Tap to Copy">
+              ${order.pickup_code || '8412'}
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); max-width: 440px; margin: 0 auto;">
+              The cashier enters this code into the desktop POS register to immediately pull your packed bag and print the receipt.
+            </p>
+          `;
+          document.getElementById('pickupCodeBox')?.addEventListener('click', () => {
+            navigator.clipboard.writeText(order.pickup_code || '8412').then(() => {
+              window.cart?.showToast(`Copied Pickup Code: ${order.pickup_code || '8412'}`);
+            });
+          });
+        } else {
+          actionBox.innerHTML = `
+            <div style="font-size: 11.5px; font-weight: 800; color: var(--tw-burgundy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Order Approved for Lalitpur Dispatch</div>
+            <h2 style="font-size: 21px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Scan Dynamic FonePay QR to Complete</h2>
+            <div style="background: #FFFFFF; padding: 16px; border-radius: var(--radius-md); display: inline-block; margin-bottom: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+              <svg width="160" height="160" viewBox="0 0 100 100">
+                <rect width="100" height="100" fill="#FFFFFF"/>
+                <rect x="5" y="5" width="25" height="25" fill="#000000"/>
+                <rect x="8" y="8" width="19" height="19" fill="#FFFFFF"/>
+                <rect x="11" y="11" width="13" height="13" fill="#000000"/>
+                <rect x="70" y="5" width="25" height="25" fill="#000000"/>
+                <rect x="73" y="8" width="19" height="19" fill="#FFFFFF"/>
+                <rect x="76" y="11" width="13" height="13" fill="#000000"/>
+                <rect x="5" y="70" width="25" height="25" fill="#000000"/>
+                <rect x="8" y="73" width="19" height="19" fill="#FFFFFF"/>
+                <rect x="11" y="76" width="13" height="13" fill="#000000"/>
+                <rect x="35" y="35" width="30" height="30" fill="#670024"/>
+              </svg>
+            </div>
+            <div style="font-size: 18px; font-weight: 900; color: var(--tw-burgundy); margin-bottom: 4px;">
+              Payable: Rs. ${(order.total_amount || 0).toLocaleString()}
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Merchant: TOTAL WINE & MORE • Ref: ${order.order_code}</div>
+          `;
+        }
+      }
+      else if (order.status === 'REJECTED') {
+        statusContainer.innerHTML = `<span style="background: #FEE2E2; color: var(--tw-red); border: 1px solid #FECACA; font-size: 12.5px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-full);">✕ Order Declined</span>`;
+        mApp.className = 'step-marker';
+        mApp.style.borderColor = 'var(--tw-red)';
+        mApp.textContent = '✕';
+        descApp.textContent = `Declined: ${order.rejection_reason || 'Items unavailable or out of stock at counter'}`;
+        actionBox.style.display = 'none';
+      }
+
+      // Render Items
+      const itemsList = document.getElementById('orderItemsList');
+      itemsList.innerHTML = (order.items || []).map(item => `
+        <div style="display: flex; justify-content: space-between; font-size: 13.5px; padding: 7px 0; border-bottom: 1px dashed var(--border-light);">
+          <span style="color: var(--text-primary);">${item.name || item.product_name} <strong style="color: var(--tw-burgundy);">× ${item.qty}</strong></span>
+          <span style="color: var(--text-secondary); font-weight: 700;">Rs. ${((item.price || item.unit_price) * item.qty).toLocaleString()}</span>
+        </div>
+      `).join('');
+
+      // WhatsApp Button Pre-fill
+      const waBtn = document.getElementById('btnWhatsAppStore');
+      const waText = encodeURIComponent(`Namaste Total Wine / KASK Mart! I am tracking my draft order #${order.order_code} (${order.customer_name}, Rs. ${order.total_amount}).`);
+      waBtn.href = `https://wa.me/${window.KASK_CONFIG.STORE_WHATSAPP}?text=${waText}`;
+    }
+  </script>
+  <!-- Mobile Bottom Sticky Navigation Bar -->
+  <nav class="tw-mobile-bottom-bar" aria-label="Mobile Bottom Navigation">
+    <a href="index.html" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">🍷</span>
+      <span>Shop</span>
+    </a>
+    <a href="index.html#searchInput" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">🔍</span>
+      <span>Search</span>
+    </a>
+    <a href="khata.html" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">📓</span>
+      <span>Khata</span>
+    </a>
+    <a href="index.html" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">🛒</span>
+      <span>Cart</span>
+    </a>
+    <a href="track.html" class="mobile-nav-btn active">
+      <span class="mobile-nav-icon">📦</span>
+      <span>Track</span>
+    </a>
+  </nav>
+
+</body>
+</html>

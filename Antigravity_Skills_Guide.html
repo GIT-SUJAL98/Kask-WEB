@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Antigravity Skills & Activation Guide</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 13px;
+      padding: 0;
+    }
+    header {
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-title h1 {
+      font-size: 22px;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .header-title p {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .header-badge {
+      font-size: 11px;
+      background: #eff6ff;
+      color: #2563eb;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid #bfdbfe;
+    }
+    
+    .activation-overview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .act-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .act-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .act-card p {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.4;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin: 14px 0 8px 0;
+    }
+
+    .skills-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .skill-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #ffffff;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .skill-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .skill-name {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      font-size: 13px;
+      color: #1d4ed8;
+      background: #eff6ff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #dbeafe;
+    }
+    .skill-type {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .skill-desc {
+      font-size: 11.5px;
+      color: #334155;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .skill-activation {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: #0f172a;
+    }
+    .skill-activation strong {
+      color: #475569;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-right: 4px;
+    }
+    .cmd-badge {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .prompt-text {
+      font-style: italic;
+      color: #047857;
+      font-weight: 500;
+    }
+
+    footer {
+      margin-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      text-align: center;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <h1>Antigravity Skills & Activation Guide</h1>
+      <p>Quick reference manual for available environment capabilities & trigger workflows</p>
+    </div>
+    <div class="header-badge">
+      13 Skills Active
+    </div>
+  </header>
+
+  <section class="activation-overview">
+    <div class="act-card">
+      <h3>⚡ 1. Automatic (Context)</h3>
+      <p>Activated dynamically when your prompt matches the skill's capabilities and domain requirements.</p>
+    </div>
+    <div class="act-card">
+      <h3>🎯 2. Explicit Mention</h3>
+      <p>Explicitly refer to the skill by name in your prompt (e.g., <em>"Using fullstack-web-master, build..."</em>).</p>
+    </div>
+    <div class="act-card">
+      <h3>🚀 3. Slash Commands</h3>
+      <p>Dedicated tools with explicit invocation rules must be run using their slash command (e.g., <code>/fixuiagent</code>).</p>
+    </div>
+  </section>
+
+  <!-- WEB DEV -->
+  <div class="section-title">Full-Stack & Web Engineering</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">fullstack-web-master</span>
+        <span class="skill-type">Workspace Skill</span>
+      </div>
+      <div class="skill-desc">
+        Complete end-to-end web engineering covering clean architecture, 8pt design token systems, modern UI/UX polish, responsive patterns (<640px, 768px, 1024px+), accessibility (a11y), and resilient API contract integration.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Auto on web tasks, or prompt: <span class="prompt-text">"Using fullstack-web-master, design a responsive navigation component"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEMINI AI -->
+  <div class="section-title">Gemini API & Multimodal AI</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">gemini-api-dev</span>
+        <span class="skill-type">Plugin Skill</span>
+      </div>
+      <div class="skill-desc">
+        Full Google GenAI SDK integration: text generation, multi-turn chat, multimodal understanding, structured JSON schemas, speech generation (TTS), and function calling.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Auto on Gemini prompts, or prompt: <span class="prompt-text">"Using gemini-api-dev, create a structured JSON extraction script"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">gemini-live-api-dev</span>
+        <span class="skill-type">Plugin Skill</span>
+      </div>
+      <div class="skill-desc">
+        Real-time, bidirectional audio/video/text streaming over WebSockets with voice activity detection (VAD), session handling, and low-latency interaction.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Using gemini-live-api-dev, set up a real-time live audio streaming session"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">gemini-omni-flash-api</span>
+        <span class="skill-type">Plugin Skill</span>
+      </div>
+      <div class="skill-desc">
+        Generative video editing, text-to-video, image-referenced video generation, and first-to-last frame video transitions using Gemini Omni 1.1 Flash.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Using gemini-omni-flash-api, generate a video transition between two frames"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- UI & DESIGN -->
+  <div class="section-title">UI & Interface Tools</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">generative_ui</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Renders rich interactive HTML/CSS/JS widgets, custom controls, and visual data dashboards inline within the chat or as standalone artifacts.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Render an interactive dashboard widget using generative_ui"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">ui-plugin-navigation</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Discovers active UI plugin panels and surfaces one-click toggles to open them in the side pane.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Open the UI panel for my installed plugin"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">fixuiagent</span>
+        <span class="skill-type">Custom Agent</span>
+      </div>
+      <div class="skill-desc">
+        Automated UI testing, responsive layout auditing across viewports, visual alignment inspection, and CSS bug diagnosis.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Slash command only: <span class="cmd-badge">/fixuiagent</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTOMATION & QA -->
+  <div class="section-title">Automation & Release QA</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">buildaudito</span>
+        <span class="skill-type">Custom Agent</span>
+      </div>
+      <div class="skill-desc">
+        Comprehensive QA validation, requirements verification, backend log diagnostics, and APK/binary release readiness sign-off.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Slash command only: <span class="cmd-badge">/buildaudito</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">automation</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Interactive assistant to design, schedule, and run background automations, recurring cron jobs, or delayed one-shot timers.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Slash command <span class="cmd-badge">/automation</span> or prompt: <span class="prompt-text">"Schedule a daily recurring task"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANTIGRAVITY PLATFORM -->
+  <div class="section-title">Antigravity System & Customization</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">plugin</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Authoring, packaging, installing, enabling, and managing reusable plugins (bundles of skills, agents, rules, and MCP servers).
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Slash command <span class="cmd-badge">/plugin</span> or prompt: <span class="prompt-text">"How do I create a new plugin?"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">agy-customizations</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Comprehensive guide to customizing Antigravity: loading priorities, progressive disclosure, authoring skills, rules, hooks, and MCP servers.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"How do I configure a custom Antigravity rule and MCP server?"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">antigravity-guide</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Complete manual and sitemap for Google Antigravity (CLI commands, keyboard shortcuts, IDE features, and configuration settings).
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Show me Antigravity CLI commands and shortcuts"</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-header">
+        <span class="skill-name">migrate-workflows</span>
+        <span class="skill-type">Built-in</span>
+      </div>
+      <div class="skill-desc">
+        Scans and automatically converts legacy workflow scripts into modern, standard Antigravity SKILL.md packages.
+      </div>
+      <div class="skill-activation">
+        <strong>How to Run:</strong> Prompt: <span class="prompt-text">"Migrate my old workflow files to modern skills"</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Generated by Antigravity &bull; Reference Document &bull; Antigravity Skills Directory
+  </footer>
+
+</body>
+</html>

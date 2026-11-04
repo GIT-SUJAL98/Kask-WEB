@@ -1,0 +1,7 @@
+{
+  "supabase_url": "https://your-project.supabase.co",
+  "supabase_key": "your-supabase-service-role-or-anon-key",
+  "db_path": "../POS KASK/KASK_Liquor_Mart_POS_Lubuntu_Portable/pos_data.db",
+  "sync_interval_seconds": 30,
+  "store_code": "KASK_MAIN"
+}

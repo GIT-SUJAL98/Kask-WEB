@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Total Wine & More — Spirits, Craft Beer, Wine & Khata Portal</title>
+  <meta name="description" content="Shop authentic single malts, imported whiskies, craft beers, fine wines, and snacks at Total Wine & More. Order online for 2-hour store pickup or same-day local delivery.">
+  <meta name="theme-color" content="#670024">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+  
+  <!-- Supabase JS Client for Realtime Cloud Relay -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Statutory Legal Compliance Strip -->
+  <div class="tw-compliance-strip" role="complementary" aria-label="Legal Drinking Age Notice">
+    <span class="tw-compliance-badge">18+ ONLY</span>
+    <span>Licensed under Nepal Liquor Act 2031. Government photo ID required upon counter collection or delivery.</span>
+  </div>
+
+  <!-- 1. Top Utility & Store Context Bar -->
+  <aside class="tw-top-bar" aria-label="Store Location and Support">
+    <div class="tw-top-bar-inner">
+      <!-- Store Selector Button -->
+      <button type="button" class="store-selector-btn" id="openStoreSelectorBtn" aria-haspopup="dialog" aria-label="Select Local Store Location">
+        <span class="store-dot-open" aria-hidden="true"></span>
+        <span>My Store: <strong id="currentStoreNameText">Lalitpur Superstore (Mahalaxmi)</strong></span>
+        <span style="font-size: 10px; opacity: 0.8;" aria-hidden="true">▼</span>
+      </button>
+
+      <!-- Secondary Links -->
+      <div class="top-bar-links">
+        <a href="track.html" class="top-link">
+          <span>📦 Order Status</span>
+        </a>
+        <a href="#dealsSection" class="top-link highlight">
+          <span>🏷️ Weekly Specials & Mix 6</span>
+        </a>
+        <a href="khata.html" class="top-link">
+          <span>📓 Khata VIP Credit</span>
+        </a>
+        <a href="approval.html" class="top-link" style="color: #93C5FD;">
+          <span>📲 Owner Terminal</span>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. Main Brand Header & Omnichannel Search -->
+  <header class="tw-main-header" role="banner">
+    <div class="tw-header-inner">
+      
+      <!-- Mobile Hamburger Menu Button -->
+      <button type="button" class="btn-mobile-menu" id="openMobileNavBtn" aria-label="Open Navigation Menu">
+        <span>☰</span>
+      </button>
+
+      <!-- Brand Logo / Wordmark -->
+      <a href="index.html" class="tw-logo-wrap" aria-label="Total Wine and More Home">
+        <div class="tw-logo-emblem" aria-hidden="true">🍷</div>
+        <div class="tw-logo-text">
+          <span class="tw-logo-main">Total Wine</span>
+          <span class="tw-logo-sub">& MORE • KASK MART</span>
+        </div>
+      </a>
+
+      <!-- Omnichannel Global Search Bar -->
+      <div class="tw-search-container" role="search">
+        <form class="tw-search-form" id="searchForm" onsubmit="event.preventDefault();">
+          <select class="search-dept-select" id="searchDeptSelect" aria-label="Select Department to Search">
+            <option value="ALL">All Departments</option>
+            <option value="Spirits">Spirits & Whisky</option>
+            <option value="Wine">Wine</option>
+            <option value="Beer">Beer & Cider</option>
+            <option value="Soft Drinks">Mixers & Drinks</option>
+            <option value="Snacks">Snacks & Cigars</option>
+          </select>
+          <input 
+            type="search" 
+            id="searchInput" 
+            class="search-input-field" 
+            placeholder="What can we help you find today? (e.g. Glenfiddich, Tuborg, Cabernet, Vodka)..." 
+            autocomplete="off"
+            aria-label="Search catalog products"
+          />
+          <button type="submit" class="search-submit-btn" id="searchSubmitBtn" aria-label="Submit search">
+            🔍
+          </button>
+        </form>
+      </div>
+
+      <!-- Quick Utility Actions -->
+      <div class="tw-header-actions">
+        <!-- Khata Customer VIP Account -->
+        <a href="khata.html" class="header-action-btn" aria-label="Customer Account and Khata Ledger">
+          <span class="action-icon" aria-hidden="true">👤</span>
+          <div class="action-text-col">
+            <span class="action-sub">Account & Credit</span>
+            <span class="action-main">Khata Member</span>
+          </div>
+        </a>
+
+        <!-- Cart Indicator Button -->
+        <button type="button" class="btn-header-cart" id="headerCartBtn" aria-haspopup="dialog" aria-label="Open Cart">
+          <div class="cart-icon-wrapper" aria-hidden="true">
+            🛒
+            <span class="cart-count-bubble" id="cartCountBadge" style="display: none;">0</span>
+          </div>
+          <span id="cartHeaderTotalText">Rs. 0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 3. Primary Category Mega-Menu Navbar -->
+  <nav class="tw-nav-bar" aria-label="Main Department Navigation">
+    <div class="tw-nav-inner">
+      <ul class="dept-nav-list" id="deptNavList">
+        
+        <!-- Spirits Mega Menu -->
+        <li class="dept-nav-item" data-category="Spirits">
+          <a class="dept-nav-link" href="#">
+            <span>Spirits & Whiskies</span>
+            <span class="nav-chevron" aria-hidden="true">▼</span>
+          </a>
+          <div class="mega-menu-panel">
+            <div>
+              <div class="mega-menu-col-title">Whiskey & Single Malt</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Whiskey">Single Malt Scotch <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Blended whiskey">Blended Scotch & Irish <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Whiskey">American Bourbon <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Blended whiskey">Nepali Heritage Whiskies <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Vodka, Rum & Gin</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Vodka">Imported Vodka <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Rum">Dark & Spiced Rum <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Gin">London Dry Gin <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Light Liquor">Light Liquors <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Shop by Price</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link price-trigger" data-max="2000">Under Rs. 2,000 <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link price-trigger" data-min="2000" data-max="5000">Rs. 2,000 – Rs. 5,000 <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link price-trigger" data-min="5000">Luxury Collection (Rs. 5,000+) <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Curated Collections</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link deal-trigger" data-deal="staff-pick">Staff Picks <span>★</span></a></li>
+                <li><a href="#" class="mega-menu-link deal-trigger" data-deal="top-rated">90+ Rated Spirits <span>95pts</span></a></li>
+                <li><a href="#" class="mega-menu-link deal-trigger" data-deal="mix6">Mix 6 & Save Eligible <span>10%</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-featured-card">
+              <span class="mega-featured-badge">Staff Spotlight</span>
+              <h4 class="mega-featured-title">Glenfiddich 12 Year</h4>
+              <p class="mega-featured-desc">Signature sweet pear notes and subtle oak maturation. Direct counter stock in Mahalaxmi.</p>
+              <a href="#" class="mega-featured-cta filter-trigger" data-query="Glenfiddich">Explore Glenfiddich →</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Wine Mega Menu -->
+        <li class="dept-nav-item" data-category="Wine">
+          <a class="dept-nav-link" href="#">
+            <span>Wine</span>
+            <span class="nav-chevron" aria-hidden="true">▼</span>
+          </a>
+          <div class="mega-menu-panel">
+            <div>
+              <div class="mega-menu-col-title">Red Wine</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Cabernet Sauvignon <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Merlot & Shiraz <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Pinot Noir <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">White & Sparkling</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Chardonnay <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Sauvignon Blanc <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Champagne & Prosecco <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Wine Regions</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Bordeaux & France <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">California Napa Valley <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Wine">Australian Shiraz <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Mix 6 Savings</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link deal-trigger" data-deal="mix6">Buy 6, Save 10% <span>🏷️</span></a></li>
+                <li><a href="#" class="mega-menu-link deal-trigger" data-deal="top-rated">Gold Medal Winners <span>🥇</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-featured-card">
+              <span class="mega-featured-badge">Mix 6 Favorite</span>
+              <h4 class="mega-featured-title">Reserve Cellar Wines</h4>
+              <p class="mega-featured-desc">Mix and match any 6 bottles across our wine selection for an instant 10% cart discount.</p>
+              <a href="#" class="mega-featured-cta deal-trigger" data-deal="mix6">Shop Mix 6 Bottles →</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Beer Mega Menu -->
+        <li class="dept-nav-item" data-category="Beer">
+          <a class="dept-nav-link" href="#">
+            <span>Beer & Cider</span>
+            <span class="nav-chevron" aria-hidden="true">▼</span>
+          </a>
+          <div class="mega-menu-panel">
+            <div>
+              <div class="mega-menu-col-title">Craft & Premium Beer</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Tuborg & Carlsberg <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Gorkha Strong & Premium <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Nepal Craft Ales & IPAs <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Pack Sizes</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Single 650ml Cans & Bottles <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Chilled 6-Packs <span>→</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Full Carton (12 / 24 Btls) <span>→</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Chilled Fast Pickup</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Walk-in Cooler Selection <span>❄️</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Beer">Curbside Ready in 15 Mins <span>⚡</span></a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="mega-menu-col-title">Mixers & Energy</div>
+              <ul class="mega-menu-links">
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Energy drink">Red Bull & Sting <span>⚡</span></a></li>
+                <li><a href="#" class="mega-menu-link filter-trigger" data-cat="Soft Drinks">Soda, Tonic & Coke <span>🥤</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-featured-card">
+              <span class="mega-featured-badge">Party Pack Deal</span>
+              <h4 class="mega-featured-title">Tuborg Draught Cans</h4>
+              <p class="mega-featured-desc">Stock up for your gathering with discounted case pricing and cold counter guarantee.</p>
+              <a href="#" class="mega-featured-cta filter-trigger" data-query="Tuborg">View Tuborg Deals →</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Mixers & More -->
+        <li class="dept-nav-item" data-category="Mixers">
+          <a class="dept-nav-link" href="#">
+            <span>Mixers, Cigars & Snacks</span>
+            <span class="nav-chevron" aria-hidden="true">▼</span>
+          </a>
+        </li>
+
+        <!-- Deals & Khata -->
+        <li class="dept-nav-item" data-category="Deals">
+          <a class="dept-nav-link deals-link" href="#dealsSection">
+            <span>🔥 Deals & Mix 6</span>
+          </a>
+        </li>
+
+        <li class="dept-nav-item">
+          <a class="dept-nav-link" href="khata.html" style="color: #FCD34D;">
+            <span>📓 Khata Credit Portal</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <!-- 4. Total Wine "Mix 6 & Save 10%" Dynamic Promotion Strip -->
+  <section class="tw-mix6-strip" id="dealsSection" aria-label="Mix 6 Promotion">
+    <div class="tw-mix6-inner">
+      <div class="mix6-callout">
+        <span class="mix6-tag">MIX 6 & SAVE 10%</span>
+        <div>
+          <span class="mix6-headline">Buy any 6 qualifying bottles of Wine or Spirits & save an extra 10%!</span>
+          <span class="mix6-sub"> • Mix and match across Single Malts, Whiskies, and Fine Wines.</span>
+        </div>
+      </div>
+
+      <!-- Live Interactive Mix 6 Tracker -->
+      <div class="mix6-tracker-box">
+        <div class="mix6-progress-track" title="Mix 6 Progress">
+          <div class="mix6-progress-fill" id="mix6ProgressFill" style="width: 0%;"></div>
+        </div>
+        <span class="mix6-status-text" id="mix6StatusText">0 of 6 Added</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Hero Promotional Section & Department Quick Access -->
+  <section class="tw-hero-section">
+    <div class="tw-hero-banner">
+      <div class="hero-content">
+        <div class="hero-pill-badge">✨ Superstore Selection & Daily Counter Sync</div>
+        <h1 class="hero-title-main">Discover Exceptional Spirits, Craft Beers & Fine Wines</h1>
+        <p class="hero-desc">
+          Shop 134+ authentic single malts, imported spirits, chilled craft beers, and cigarettes directly from our Lalitpur store register.
+        </p>
+
+        <!-- Fulfillment Options Selector -->
+        <div class="hero-fulfillment-toggles" role="radiogroup" aria-label="Fulfillment Method">
+          <button type="button" class="fulfillment-chip active" id="chipPickup" role="radio" aria-checked="true">
+            <span>🚶 2-Hour In-Store Pickup (Free)</span>
+          </button>
+          <button type="button" class="fulfillment-chip" id="chipDelivery" role="radio" aria-checked="false">
+            <span>🛵 Same-Day Lalitpur Delivery</span>
+          </button>
+          <button type="button" class="fulfillment-chip" id="chipCurbside" role="radio" aria-checked="false">
+            <span>🚗 Fast Counter Curbside</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Circular Department Quick-Browse Row -->
+    <div class="tw-dept-circles-row" aria-label="Top Departments">
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Whiskey">
+        <div class="circle-icon-box">🥃</div>
+        <span class="dept-circle-label">Single Malt & Whisky</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Blended whiskey">
+        <div class="circle-icon-box">🥃</div>
+        <span class="dept-circle-label">Bourbon & Blends</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Beer">
+        <div class="circle-icon-box">🍺</div>
+        <span class="dept-circle-label">Craft Beer & Cider</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Wine">
+        <div class="circle-icon-box">🍷</div>
+        <span class="dept-circle-label">Fine Wines</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Vodka">
+        <div class="circle-icon-box">🍸</div>
+        <span class="dept-circle-label">Vodka & Gin</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Soft Drinks">
+        <div class="circle-icon-box">🥤</div>
+        <span class="dept-circle-label">Mixers & Sodas</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Snacks">
+        <div class="circle-icon-box">🍿</div>
+        <span class="dept-circle-label">Bar Snacks</span>
+      </a>
+      <a href="#" class="dept-circle-card filter-trigger" data-cat="Cigrates">
+        <div class="circle-icon-box">🚬</div>
+        <span class="dept-circle-label">Cigarettes</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 6. Main Catalog Shopping Layout: Faceted Filter Sidebar + Product Grid -->
+  <main class="tw-catalog-layout" id="mainCatalogArea">
+    
+    <!-- Left Faceted Filter Sidebar -->
+    <aside class="tw-filter-sidebar" id="filterSidebar" aria-label="Catalog Filters">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">
+          <span>⚡ Filters</span>
+        </h2>
+        <button type="button" class="btn-clear-all-filters" id="btnClearAllFilters">Clear All</button>
+      </div>
+
+      <!-- Active Filter Tags Box -->
+      <div class="active-filters-box" id="activeFiltersBox" style="display: none;">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Accordion: Department -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Department</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body" id="filterDeptBody">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Accordion: Country & Region -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Country & Origin</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body" id="filterOriginBody">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Accordion: Bottle Size / Volume -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Bottle Size / Volume</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body" id="filterVolumeBody">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Accordion: Price Range -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Price Range</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body">
+          <label class="filter-checkbox-label">
+            <span><input type="radio" name="priceRange" value="ALL" checked> All Prices</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span><input type="radio" name="priceRange" value="0-1000"> Under Rs. 1,000</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span><input type="radio" name="priceRange" value="1000-3000"> Rs. 1,000 – Rs. 3,000</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span><input type="radio" name="priceRange" value="3000-6000"> Rs. 3,000 – Rs. 6,000</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span><input type="radio" name="priceRange" value="6000-999999"> Rs. 6,000+ (Luxury)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Accordion: Customer Rating & Staff Picks -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Ratings & Awards</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body">
+          <label class="filter-checkbox-label">
+            <span class="filter-star-row">
+              <input type="checkbox" id="chkRating45"> ★★★★★ 4.5 & Up
+            </span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span class="filter-star-row">
+              <input type="checkbox" id="chkStaffPick"> 🏆 Staff Picks Only
+            </span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span class="filter-star-row">
+              <input type="checkbox" id="chkMix6Only"> 🏷️ Mix 6 Eligible Only
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Accordion: Fulfillment Availability -->
+      <div class="filter-accordion open">
+        <button type="button" class="accordion-header" aria-expanded="true">
+          <span>Availability</span>
+          <span class="accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="accordion-body">
+          <label class="filter-checkbox-label">
+            <span><input type="checkbox" id="chkInStockOnly"> In Stock Today at Store</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <span><input type="checkbox" id="chkPackDealsOnly"> Bulk / Pack Savings Available</span>
+          </label>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Right Products Grid Container -->
+    <section class="tw-catalog-content" aria-label="Catalog Products">
+      
+      <!-- Catalog Controls Toolbar -->
+      <div class="tw-catalog-toolbar">
+        <div class="toolbar-left">
+          <div class="catalog-item-count" id="catalogItemCount">
+            Showing <strong>134</strong> items
+          </div>
+          <!-- Mobile Filter Button Trigger -->
+          <button type="button" class="btn-mobile-filter" id="openMobileFilterBtn">
+            <span>⚡ Filters & Sort</span>
+          </button>
+        </div>
+
+        <div class="toolbar-right">
+          <label for="catalogSortSelect" class="sort-label">Sort by:</label>
+          <select id="catalogSortSelect" class="sort-dropdown" aria-label="Sort products by">
+            <option value="featured">Featured & Staff Picks</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating-desc">Customer Rating (Highest)</option>
+            <option value="name-asc">Alphabetical (A – Z)</option>
+            <option value="savings-desc">Biggest Savings (MSRP Discount)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div class="tw-product-grid" id="productGrid" aria-live="polite">
+        <!-- Rendered by catalog.js with skeleton shimmer loaders -->
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- 7. Total Wine Shopping Cart Drawer Modal -->
+  <div class="tw-cart-drawer-overlay" id="cartDrawerOverlay" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+    <div class="tw-cart-drawer" id="cartDrawerContainer">
+      <!-- Injected by catalog.js & cart.js -->
+    </div>
+  </div>
+
+  <!-- 8. Product Quick View Modal -->
+  <div class="tw-modal-overlay" id="quickViewModal" role="dialog" aria-modal="true" aria-label="Product Quick View">
+    <div class="tw-modal-card" id="quickViewCardContent">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- 9. Store Selector Modal -->
+  <div class="tw-modal-overlay" id="storeSelectorModal" role="dialog" aria-modal="true" aria-label="Change Store Location">
+    <div class="tw-modal-card">
+      <div class="modal-header-row">
+        <h3 class="modal-heading">Choose Your Fulfillment Store</h3>
+        <button type="button" class="cart-drawer-close-btn" id="closeStoreModalBtn" style="color: var(--text-primary);">×</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+        Select your local store to see accurate real-time bottle inventory, counter aisle numbers, and local delivery zones.
+      </p>
+
+      <div class="store-option-card active" data-store="Mahalaxmi">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <strong style="color: var(--tw-burgundy); font-size: 15px;">Lalitpur Superstore (Mahalaxmi)</strong>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+              Ward 4, Mahalaxmi Municipality, Lalitpur • Ph: +977-9851133129
+            </div>
+            <div style="font-size: 11.5px; color: var(--tw-green); font-weight: 700; margin-top: 4px;">
+              ● Open for Orders (10:00 AM – 9:30 PM) • 2-Hr Pickup Available
+            </div>
+          </div>
+          <span style="font-size: 18px; color: var(--tw-burgundy);">✓</span>
+        </div>
+      </div>
+
+      <div class="store-option-card" data-store="Kathmandu">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <strong style="font-size: 15px; color: var(--text-primary);">Kathmandu Express Hub</strong>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+              Baneshwor / Tinkune Regional Hub • Ph: +977-9841272562
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+              ● Regional Stock Warehouse • Delivery Only
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-tw-checkout" id="btnConfirmStoreSelection" style="margin-top: 14px;">
+        Set as My Shopping Store
+      </button>
+    </div>
+  </div>
+
+  <!-- 10. Mobile Filter Drawer (Slide-up Sheet) -->
+  <div class="tw-mobile-filter-drawer" id="mobileFilterDrawer" role="dialog" aria-modal="true" aria-label="Mobile Filters">
+    <div class="mobile-drawer-header">
+      <h3 style="font-size: 16px; font-weight: 800;">Filters & Sort</h3>
+      <button type="button" class="cart-drawer-close-btn" id="closeMobileFilterBtn">×</button>
+    </div>
+    <div class="mobile-drawer-content" id="mobileFilterDrawerContent">
+      <!-- Injected clone of sidebar filters for seamless mobile experience -->
+    </div>
+    <div class="mobile-drawer-footer">
+      <button type="button" class="btn-tw-add-cart" id="btnMobileClearAll" style="background: #F4F4F5; color: var(--text-primary); border-color: var(--border-medium);">
+        Clear All
+      </button>
+      <button type="button" class="btn-tw-checkout" id="btnMobileApplyFilters" style="margin-top: 0; flex: 2;">
+        Apply Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Slide-out Mobile Navigation Drawer -->
+  <div class="tw-mobile-nav-drawer" id="mobileNavDrawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+    <div class="mobile-nav-sheet">
+      <div class="mobile-nav-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🍷</span>
+          <span class="mobile-nav-title">Total Wine & More</span>
+        </div>
+        <button type="button" class="mobile-nav-close-btn" id="closeMobileNavBtn" aria-label="Close Navigation">×</button>
+      </div>
+
+      <div style="padding: 12px 16px; background: #FAF5F6; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--tw-burgundy);">📍 Mahalaxmi Superstore</span>
+        <button type="button" class="btn-tw-add-cart" id="mobileDrawerStoreChangeBtn" style="font-size: 11px; padding: 4px 8px; min-height: 28px;">Change</button>
+      </div>
+
+      <div class="mobile-nav-group-title">Shop by Department</div>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Whiskey">
+        <span>🥃 Single Malt & Spirits</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Blended whiskey">
+        <span>🥃 Bourbon & Blended Whiskies</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Wine">
+        <span>🍷 Fine Wines & Sparkling</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Beer">
+        <span>🍺 Craft Beer & Ciders</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Vodka">
+        <span>🍸 Premium Vodka & Gin</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Soft Drinks">
+        <span>🥤 Mixers, Sodas & Energy Drinks</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Snacks">
+        <span>🍿 Bar Snacks & Chakhna</span>
+        <span>→</span>
+      </a>
+      <a href="#" class="mobile-nav-link-item filter-trigger" data-cat="Cigrates">
+        <span>🚬 Cigarettes & Tobacco</span>
+        <span>→</span>
+      </a>
+
+      <div class="mobile-nav-group-title">Specials & Rewards</div>
+      <a href="#dealsSection" class="mobile-nav-link-item" id="mobileNavMix6Link" style="color: var(--tw-gold-dark);">
+        <span>🏷️ Mix 6 & Save 10% Specials</span>
+        <span>★</span>
+      </a>
+      <a href="khata.html" class="mobile-nav-link-item" style="color: var(--tw-burgundy);">
+        <span>📓 Khata VIP Credit Ledger</span>
+        <span>→</span>
+      </a>
+      <a href="track.html" class="mobile-nav-link-item">
+        <span>📦 Order Status & Live Tracking</span>
+        <span>→</span>
+      </a>
+      <a href="approval.html" class="mobile-nav-link-item" style="color: #1D4ED8;">
+        <span>📲 Store Owner Terminal</span>
+        <span>→</span>
+      </a>
+
+      <div style="margin-top: auto; padding: 20px 16px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); text-align: center;">
+        Need Help? Call <a href="tel:+9779851133129" style="color: var(--tw-burgundy); font-weight: 700;">+977-9851133129</a><br>
+        Daily Store Hours: 10:00 AM – 9:30 PM
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Mobile Bottom Sticky Navigation Bar -->
+  <nav class="tw-mobile-bottom-bar" aria-label="Mobile Bottom Navigation">
+    <a href="index.html" class="mobile-nav-btn active">
+      <span class="mobile-nav-icon">🍷</span>
+      <span>Shop</span>
+    </a>
+    <button type="button" class="mobile-nav-btn" id="mobileNavSearchBtn">
+      <span class="mobile-nav-icon">🔍</span>
+      <span>Search</span>
+    </button>
+    <a href="khata.html" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">📓</span>
+      <span>Khata</span>
+    </a>
+    <button type="button" class="mobile-nav-btn" id="mobileNavCartBtn">
+      <span class="mobile-nav-icon">🛒</span>
+      <span>Cart (<span id="mobileCartCountInline">0</span>)</span>
+    </button>
+    <a href="track.html" class="mobile-nav-btn">
+      <span class="mobile-nav-icon">📦</span>
+      <span>Track</span>
+    </a>
+  </nav>
+
+  <!-- 12. Total Wine & More Multi-Column Footer -->
+  <footer class="tw-footer" role="contentinfo">
+    <div class="tw-footer-inner">
+      
+      <!-- Newsletter Banner -->
+      <div class="footer-newsletter-banner">
+        <div class="newsletter-text">
+          <h3>Join Total Wine & More Insider Club</h3>
+          <p>Get exclusive early access to single malt allocations, Mix 6 bonus deals, and Khata member rewards.</p>
+        </div>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to Total Wine Insiders!');">
+          <input type="email" class="newsletter-input" placeholder="Enter your email address..." required aria-label="Email address for newsletter" />
+          <button type="submit" class="btn-newsletter-join">Join Free</button>
+        </form>
+      </div>
+
+      <!-- Navigation Columns Grid -->
+      <div class="footer-nav-grid">
+        <div>
+          <h4 class="footer-col-title">Customer Support</h4>
+          <ul class="footer-links-list">
+            <li class="footer-link-item"><a href="track.html">Order Status & Tracking</a></li>
+            <li class="footer-link-item"><a href="khata.html">Khata Credit Account</a></li>
+            <li class="footer-link-item"><a href="approval.html">Owner Approval Terminal</a></li>
+            <li class="footer-link-item"><a href="#">Store Pickup FAQs</a></li>
+            <li class="footer-link-item"><a href="#">Lalitpur Delivery Geofence</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Popular Departments</h4>
+          <ul class="footer-links-list">
+            <li class="footer-link-item"><a href="#" class="filter-trigger" data-cat="Whiskey">Single Malt Scotch</a></li>
+            <li class="footer-link-item"><a href="#" class="filter-trigger" data-cat="Blended whiskey">Blended Bourbon</a></li>
+            <li class="footer-link-item"><a href="#" class="filter-trigger" data-cat="Beer">Craft Beer & Ciders</a></li>
+            <li class="footer-link-item"><a href="#" class="filter-trigger" data-cat="Wine">Cabernet & Fine Wine</a></li>
+            <li class="footer-link-item"><a href="#" class="filter-trigger" data-cat="Vodka">Imported Vodka</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Resources & Guides</h4>
+          <ul class="footer-links-list">
+            <li class="footer-link-item"><a href="#">Mix 6 & Save 10% Guide</a></li>
+            <li class="footer-link-item"><a href="#">Whiskey Tasting Notes</a></li>
+            <li class="footer-link-item"><a href="#">Food & Spirits Pairings</a></li>
+            <li class="footer-link-item"><a href="#">Party Planning Calculator</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">About Total Wine</h4>
+          <ul class="footer-links-list">
+            <li class="footer-link-item"><a href="#">Our Lalitpur Superstore</a></li>
+            <li class="footer-link-item"><a href="#">Direct Till POS Integration</a></li>
+            <li class="footer-link-item"><a href="#">Nepal Liquor Act Compliance</a></li>
+            <li class="footer-link-item"><a href="#">Responsible Drinking Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Legal & Copyright Compliance Notice -->
+      <div class="footer-bottom-compliance">
+        <div>
+          © 2026 Total Wine & More • KASK Liquor Mart. All rights reserved. Licensed under Nepal Liquor Act 2031 (1974).
+        </div>
+        <div>
+          Mahalaxmi Municipality, Lalitpur, Nepal • Hotline: +977-9851133129
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/catalog.js"></script>
+</body>
+</html>
